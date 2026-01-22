@@ -43,7 +43,7 @@ const TrackingInput = ({ value, onChange, onSubmit, isSearching }: TrackingInput
         </button>
       </div>
       <p className="text-center text-white/60 text-sm mt-3">
-        Try: AMF22385, HNL123456789, or HNL987654321
+        
       </p>
     </form>
   );
