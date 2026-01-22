@@ -107,8 +107,8 @@ const Contact = () => {
                   <div>
                     <h3 className="font-semibold text-foreground mb-1">Email</h3>
                     <p className="text-muted-foreground text-sm">
-                      General: support@hnlshipping.com<br />
-                      Sales: sales@hnlshipping.com
+                      General: support@hnlshippingmanagement.com<br />
+                      Sales: sales@hnlshippingmanagement.com
                     </p>
                   </div>
                 </div>
@@ -250,13 +250,13 @@ const Contact = () => {
       </section>
 
       {/* Map Placeholder */}
-      <section className="bg-muted h-96 flex items-center justify-center">
+      {/* <section className="bg-muted h-96 flex items-center justify-center">
         <div className="text-center">
           <MapPin className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
           <p className="text-muted-foreground font-medium">Interactive Map</p>
           <p className="text-muted-foreground/70 text-sm">1250 Harbor Boulevard, Los Angeles, CA</p>
         </div>
-      </section>
+      </section> */}
     </main>
   );
 };
