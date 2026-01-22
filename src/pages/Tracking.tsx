@@ -28,8 +28,8 @@ interface TrackingResult {
 
 // Mock tracking data
 const mockTrackingData: Record<string, TrackingResult> = {
-  'AMF22385': {
-    trackingNumber: 'AMF22385',
+  'HNL11385532': {
+    trackingNumber: 'HNL11385532',
     status: 'in-transit',
     estimatedDelivery: 'Nov 13, 2025',
     lastUpdated: '5 hours ago',
@@ -161,7 +161,7 @@ const Tracking = () => {
               <AlertCircle className="w-12 h-12 text-destructive mx-auto mb-3" />
               <p className="text-destructive font-medium mb-2">{error}</p>
               <p className="text-sm text-muted-foreground">
-                Try: AMF22385, HNL123456789, or HNL987654321
+                
               </p>
             </div>
           )}
