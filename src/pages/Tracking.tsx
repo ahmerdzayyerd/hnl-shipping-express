@@ -1,49 +1,78 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Search, Package, Truck, CheckCircle2, MapPin, Clock, AlertCircle } from 'lucide-react';
+import { Package, AlertCircle } from 'lucide-react';
+import TrackingInput from '@/components/tracking/TrackingInput';
+import ShipmentDetailsCard from '@/components/tracking/ShipmentDetailsCard';
+import ShipmentTimeline from '@/components/tracking/ShipmentTimeline';
+import LiveRouteVisual from '@/components/tracking/LiveRouteVisual';
 
-interface TrackingEvent {
-  status: string;
+interface TimelineEvent {
+  date: string;
+  time: string;
   location: string;
-  timestamp: string;
-  description: string;
+  status: string;
+  isCompleted: boolean;
+  isCurrent?: boolean;
 }
 
 interface TrackingResult {
   trackingNumber: string;
   status: 'in-transit' | 'delivered' | 'pending' | 'exception';
   estimatedDelivery: string;
+  lastUpdated: string;
   origin: string;
   destination: string;
-  events: TrackingEvent[];
+  progress: number;
+  events: TimelineEvent[];
 }
 
 // Mock tracking data
 const mockTrackingData: Record<string, TrackingResult> = {
+  'AMF22385': {
+    trackingNumber: 'AMF22385',
+    status: 'in-transit',
+    estimatedDelivery: 'Nov 13, 2025',
+    lastUpdated: '5 hours ago',
+    origin: 'Dubai, UAE',
+    destination: 'Puerto Rico',
+    progress: 68,
+    events: [
+      { date: 'Nov 12', time: '13:11', location: "Li'Undray Rocks", status: 'In Transit', isCompleted: true, isCurrent: true },
+      { date: 'Nov 11', time: '22:31', location: 'Charlotte Amalie', status: 'In Transit', isCompleted: true },
+      { date: 'Nov 11', time: '14:53', location: 'British Virgin Islands', status: 'In Transit', isCompleted: true },
+      { date: 'Nov 10', time: '04:18', location: 'Las Palmas de Gran Canaria, Spain', status: 'Cleared Customs', isCompleted: true },
+      { date: 'Nov 07', time: '11:10', location: 'Dubai, UAE', status: 'In Transit', isCompleted: true },
+      { date: 'Nov 07', time: '07:22', location: 'Dubai, UAE', status: 'Picked Up', isCompleted: true },
+    ],
+  },
   'HNL123456789': {
     trackingNumber: 'HNL123456789',
     status: 'in-transit',
     estimatedDelivery: 'January 24, 2026',
+    lastUpdated: '2 hours ago',
     origin: 'Los Angeles, CA',
     destination: 'New York, NY',
+    progress: 55,
     events: [
-      { status: 'In Transit', location: 'Denver, CO', timestamp: 'Jan 22, 2026 - 2:30 PM', description: 'Package in transit to next facility' },
-      { status: 'Departed Facility', location: 'Phoenix, AZ', timestamp: 'Jan 21, 2026 - 11:45 AM', description: 'Package departed from sorting facility' },
-      { status: 'Arrived at Facility', location: 'Phoenix, AZ', timestamp: 'Jan 21, 2026 - 6:20 AM', description: 'Package arrived at sorting facility' },
-      { status: 'Picked Up', location: 'Los Angeles, CA', timestamp: 'Jan 20, 2026 - 3:15 PM', description: 'Package picked up from sender' },
+      { date: 'Jan 22', time: '14:30', location: 'Denver, CO', status: 'In Transit', isCompleted: true, isCurrent: true },
+      { date: 'Jan 21', time: '11:45', location: 'Phoenix, AZ', status: 'Departed Facility', isCompleted: true },
+      { date: 'Jan 21', time: '06:20', location: 'Phoenix, AZ', status: 'Arrived at Facility', isCompleted: true },
+      { date: 'Jan 20', time: '15:15', location: 'Los Angeles, CA', status: 'Picked Up', isCompleted: true },
     ],
   },
   'HNL987654321': {
     trackingNumber: 'HNL987654321',
     status: 'delivered',
     estimatedDelivery: 'January 20, 2026',
+    lastUpdated: '2 days ago',
     origin: 'Seattle, WA',
     destination: 'Chicago, IL',
+    progress: 100,
     events: [
-      { status: 'Delivered', location: 'Chicago, IL', timestamp: 'Jan 20, 2026 - 10:45 AM', description: 'Package delivered to recipient' },
-      { status: 'Out for Delivery', location: 'Chicago, IL', timestamp: 'Jan 20, 2026 - 7:30 AM', description: 'Package out for delivery' },
-      { status: 'Arrived at Facility', location: 'Chicago, IL', timestamp: 'Jan 19, 2026 - 11:00 PM', description: 'Package arrived at local facility' },
-      { status: 'In Transit', location: 'Minneapolis, MN', timestamp: 'Jan 18, 2026 - 4:15 PM', description: 'Package in transit' },
+      { date: 'Jan 20', time: '10:45', location: 'Chicago, IL', status: 'Delivered', isCompleted: true, isCurrent: true },
+      { date: 'Jan 20', time: '07:30', location: 'Chicago, IL', status: 'Out for Delivery', isCompleted: true },
+      { date: 'Jan 19', time: '23:00', location: 'Chicago, IL', status: 'Arrived at Facility', isCompleted: true },
+      { date: 'Jan 18', time: '16:15', location: 'Minneapolis, MN', status: 'In Transit', isCompleted: true },
     ],
   },
 };
@@ -54,10 +83,11 @@ const Tracking = () => {
   const [result, setResult] = useState<TrackingResult | null>(null);
   const [error, setError] = useState('');
   const [isSearching, setIsSearching] = useState(false);
+  const [showResults, setShowResults] = useState(false);
 
   useEffect(() => {
     document.title = 'Track Your Shipment | HNL Shipping Management';
-    
+
     // Auto-search if tracking number is in URL
     const urlNumber = searchParams.get('number');
     if (urlNumber) {
@@ -75,194 +105,122 @@ const Tracking = () => {
     setIsSearching(true);
     setError('');
     setResult(null);
+    setShowResults(false);
 
     // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    await new Promise((resolve) => setTimeout(resolve, 800));
 
     const data = mockTrackingData[searchNumber.toUpperCase()];
     if (data) {
       setResult(data);
+      // Trigger animation after a brief delay
+      setTimeout(() => setShowResults(true), 100);
     } else {
-      setError('No shipment found with this tracking number. Try HNL123456789 or HNL987654321 for demo.');
+      setError('No shipment found with this tracking number.');
+      setShowResults(true);
     }
 
     setIsSearching(false);
   };
 
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case 'in-transit':
-        return <Truck className="w-6 h-6 text-secondary" />;
-      case 'delivered':
-        return <CheckCircle2 className="w-6 h-6 text-accent" />;
-      case 'exception':
-        return <AlertCircle className="w-6 h-6 text-destructive" />;
-      default:
-        return <Package className="w-6 h-6 text-muted-foreground" />;
-    }
-  };
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'in-transit':
-        return 'bg-secondary/10 text-secondary border-secondary/20';
-      case 'delivered':
-        return 'bg-accent/20 text-accent border-accent/30';
-      case 'exception':
-        return 'bg-destructive/10 text-destructive border-destructive/20';
-      default:
-        return 'bg-muted text-muted-foreground border-border';
-    }
-  };
-
   return (
     <main className="pt-20">
-      {/* Hero Section */}
-      <section className="bg-hero-gradient py-16 md:py-24 relative overflow-hidden">
+      {/* Hero Section with Search */}
+      <section className="bg-hero-gradient py-12 md:py-20 relative overflow-hidden">
         <div className="absolute inset-0">
           <div className="absolute top-10 right-10 w-64 h-64 bg-accent/20 rounded-full blur-3xl" />
           <div className="absolute bottom-10 left-10 w-80 h-80 bg-secondary/20 rounded-full blur-3xl" />
         </div>
-        <div className="container-main relative z-10">
-          <div className="max-w-3xl mx-auto text-center">
-            <h1 className="font-display text-4xl md:text-5xl font-bold text-white mb-4">
+        <div className="container-main relative z-10 px-4">
+          <div className="max-w-3xl mx-auto text-center mb-8">
+            <h1 className="font-display text-3xl md:text-5xl font-bold text-white mb-3">
               Track Your Shipment
             </h1>
-            <p className="text-white/80 text-lg mb-8">
-              Enter your tracking number to get real-time updates on your package location.
+            <p className="text-white/80 text-base md:text-lg">
+              Enter your tracking number to get real-time updates
             </p>
-
-            {/* Search Form */}
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                handleSearch();
-              }}
-              className="flex flex-col sm:flex-row gap-3 max-w-xl mx-auto"
-            >
-              <div className="relative flex-1">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-                <input
-                  type="text"
-                  value={trackingNumber}
-                  onChange={(e) => setTrackingNumber(e.target.value)}
-                  placeholder="Enter tracking number (e.g., HNL123456789)"
-                  className="w-full pl-12 pr-4 py-4 rounded-xl bg-white text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-secondary shadow-elevated"
-                />
-              </div>
-              <button
-                type="submit"
-                disabled={isSearching}
-                className="btn-hero disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {isSearching ? 'Searching...' : 'Track'}
-              </button>
-            </form>
           </div>
+
+          <TrackingInput
+            value={trackingNumber}
+            onChange={setTrackingNumber}
+            onSubmit={() => handleSearch()}
+            isSearching={isSearching}
+          />
         </div>
       </section>
 
       {/* Results Section */}
-      <section className="section-padding bg-background">
-        <div className="container-main max-w-4xl">
-          {error && (
-            <div className="bg-destructive/10 border border-destructive/20 rounded-xl p-6 text-center">
-              <AlertCircle className="w-10 h-10 text-destructive mx-auto mb-3" />
-              <p className="text-destructive font-medium">{error}</p>
+      <section className="py-8 md:py-12 bg-background min-h-[50vh]">
+        <div className="container-main px-4">
+          {/* Error State */}
+          {error && showResults && (
+            <div 
+              className="max-w-md mx-auto bg-destructive/10 border border-destructive/20 rounded-2xl p-6 text-center animate-fade-in"
+            >
+              <AlertCircle className="w-12 h-12 text-destructive mx-auto mb-3" />
+              <p className="text-destructive font-medium mb-2">{error}</p>
+              <p className="text-sm text-muted-foreground">
+                Try: AMF22385, HNL123456789, or HNL987654321
+              </p>
             </div>
           )}
 
-          {result && (
-            <div className="space-y-8 animate-fade-up">
-              {/* Status Card */}
-              <div className="card-service">
-                <div className="flex flex-col md:flex-row md:items-center gap-6 mb-8">
-                  <div className="flex items-center gap-4">
-                    {getStatusIcon(result.status)}
-                    <div>
-                      <p className="text-sm text-muted-foreground">Tracking Number</p>
-                      <p className="font-display font-bold text-xl text-foreground">{result.trackingNumber}</p>
-                    </div>
-                  </div>
-                  <span className={`inline-flex px-4 py-2 rounded-full text-sm font-semibold border ${getStatusColor(result.status)} self-start md:ml-auto`}>
-                    {result.status === 'in-transit' ? 'In Transit' : result.status.charAt(0).toUpperCase() + result.status.slice(1)}
-                  </span>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  <div className="flex items-start gap-3">
-                    <MapPin className="w-5 h-5 text-secondary mt-0.5" />
-                    <div>
-                      <p className="text-sm text-muted-foreground">Origin</p>
-                      <p className="font-medium text-foreground">{result.origin}</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <MapPin className="w-5 h-5 text-accent mt-0.5" />
-                    <div>
-                      <p className="text-sm text-muted-foreground">Destination</p>
-                      <p className="font-medium text-foreground">{result.destination}</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <Clock className="w-5 h-5 text-secondary mt-0.5" />
-                    <div>
-                      <p className="text-sm text-muted-foreground">Estimated Delivery</p>
-                      <p className="font-medium text-foreground">{result.estimatedDelivery}</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Map Placeholder */}
-              <div className="bg-muted rounded-2xl h-64 flex items-center justify-center border border-border">
-                <div className="text-center">
-                  <MapPin className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
-                  <p className="text-muted-foreground">Interactive tracking map</p>
-                  <p className="text-sm text-muted-foreground/70">Coming soon</p>
-                </div>
-              </div>
-
-              {/* Timeline */}
-              <div className="card-service">
-                <h3 className="font-display text-xl font-semibold text-foreground mb-6">Shipment History</h3>
+          {/* Results */}
+          {result && showResults && (
+            <div 
+              className="animate-fade-in"
+              style={{ animationDuration: '0.4s' }}
+            >
+              {/* Mobile: Stack vertically | Desktop: Two columns */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 max-w-6xl mx-auto">
+                {/* Left Column: Details + Timeline */}
                 <div className="space-y-6">
-                  {result.events.map((event, index) => (
-                    <div key={index} className="flex gap-4">
-                      <div className="relative flex flex-col items-center">
-                        <div className={`w-4 h-4 rounded-full ${index === 0 ? 'bg-secondary' : 'bg-border'}`} />
-                        {index < result.events.length - 1 && (
-                          <div className="w-0.5 h-full bg-border absolute top-4" />
-                        )}
-                      </div>
-                      <div className="flex-1 pb-6">
-                        <p className="font-semibold text-foreground">{event.status}</p>
-                        <p className="text-sm text-muted-foreground">{event.description}</p>
-                        <div className="flex flex-wrap gap-4 mt-2 text-sm text-muted-foreground">
-                          <span className="flex items-center gap-1">
-                            <MapPin className="w-3 h-3" /> {event.location}
-                          </span>
-                          <span className="flex items-center gap-1">
-                            <Clock className="w-3 h-3" /> {event.timestamp}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
+                  <ShipmentDetailsCard
+                    trackingNumber={result.trackingNumber}
+                    status={result.status}
+                    origin={result.origin}
+                    destination={result.destination}
+                    estimatedDelivery={result.estimatedDelivery}
+                    lastUpdated={result.lastUpdated}
+                  />
+                  <ShipmentTimeline events={result.events} />
+                </div>
+
+                {/* Right Column: Live Route */}
+                <div className="lg:sticky lg:top-24 lg:self-start">
+                  <LiveRouteVisual
+                    origin={result.origin}
+                    destination={result.destination}
+                    progress={result.progress}
+                  />
                 </div>
               </div>
             </div>
           )}
 
-          {!result && !error && (
-            <div className="text-center py-12">
-              <Package className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
+          {/* Empty State */}
+          {!result && !error && !isSearching && (
+            <div className="text-center py-16">
+              <div className="w-20 h-20 rounded-2xl bg-muted flex items-center justify-center mx-auto mb-5">
+                <Package className="w-10 h-10 text-muted-foreground" />
+              </div>
               <h3 className="font-display text-xl font-semibold text-foreground mb-2">
                 Ready to Track
               </h3>
-              <p className="text-muted-foreground">
-                Enter your tracking number above to see your shipment status.
+              <p className="text-muted-foreground max-w-sm mx-auto">
+                Enter your tracking number above to see real-time shipment status and location.
               </p>
+            </div>
+          )}
+
+          {/* Loading State */}
+          {isSearching && (
+            <div className="text-center py-16">
+              <div className="w-16 h-16 rounded-2xl bg-secondary/10 flex items-center justify-center mx-auto mb-4 animate-pulse">
+                <Package className="w-8 h-8 text-secondary" />
+              </div>
+              <p className="text-muted-foreground">Locating your shipment...</p>
             </div>
           )}
         </div>
