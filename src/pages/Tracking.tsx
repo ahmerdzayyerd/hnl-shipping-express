@@ -75,6 +75,23 @@ const mockTrackingData: Record<string, TrackingResult> = {
       { date: 'Jan 26', time: '15:15', location: 'Rue Royale, Paris', status: 'Picked Up', isCompleted: true },
     ],
   },
+  'HNL10385532': {
+    trackingNumber: 'HNL10385532',
+    status: 'in-transit',
+    estimatedDelivery: 'Feb 9, 2026',
+    lastUpdated: '3 hours ago',
+    origin: 'Robinson Road, Singapore',
+    destination: ' California, USA',
+    progress: 27,
+    events: [
+      // { date: 'Nov 12', time: '13:11', location: "Li'Undray Rocks", status: 'In Transit', isCompleted: true, isCurrent: true },
+      // { date: 'Nov 11', time: '22:31', location: 'Charlotte Amalie', status: 'In Transit', isCompleted: true },
+      // { date: 'Nov 11', time: '14:53', location: 'British Virgin Islands', status: 'In Transit', isCompleted: true },
+      // { date: 'Nov 10', time: '04:18', location: 'Las Palmas de Gran Canaria, Spain', status: 'Cleared Customs', isCompleted: true },
+      { date: 'Feb 9', time: '07:30', location: 'A350-900ULR, Cargo', status: 'In Transit', isCompleted: true },
+      { date: 'Feb 7', time: '07:22', location: 'Robinson Road, Singapore', status: 'Picked Up', isCompleted: true },
+    ],
+  },
 };
 
 const Tracking = () => {
