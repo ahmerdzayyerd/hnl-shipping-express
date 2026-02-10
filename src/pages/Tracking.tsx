@@ -48,12 +48,13 @@ const mockTrackingData: Record<string, TrackingResult> = {
   'HNL3450166': {
     trackingNumber: 'HNL3450166',
     status: 'in-transit',
-    estimatedDelivery: 'February 3, 2026',
+    estimatedDelivery: 'February 13, 2026',
     lastUpdated: '2 hours ago',
     origin: 'Paris, France',
     destination: 'Surrey, England',
-    progress: 15,
+    progress: 41,
     events: [
+      { date: 'Feb 6', time: '10:13', location: 'A350-900ULR, Cargo', status: 'In Transit', isCompleted: true, isCurrent: true },
       { date: 'Feb 2', time: '14:30', location: 'A350-900ULR, Cargo', status: 'In Transit', isCompleted: true, isCurrent: true },
       { date: 'Jan 31', time: '11:45', location: 'A350-900ULR, Cargo', status: 'Departed Facility', isCompleted: true },
       { date: 'Jan 28', time: '06:20', location: 'Rue Royale, Paris', status: 'Arrived at Facility', isCompleted: true },
@@ -67,7 +68,7 @@ const mockTrackingData: Record<string, TrackingResult> = {
     lastUpdated: '2 hours ago',
     origin: 'Paris, France',
     destination: 'Pretoria, South Africa',
-    progress: 41,
+    progress: 11,
     events: [
       // { date: 'Jan 20', time: '10:45', location: 'Chicago, IL', status: 'Delivered', isCompleted: true, isCurrent: true },
       // { date: 'Jan 20', time: '07:30', location: 'Chicago, IL', status: 'Out for Delivery', isCompleted: true },
