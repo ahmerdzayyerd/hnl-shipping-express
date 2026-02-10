@@ -52,8 +52,10 @@ const mockTrackingData: Record<string, TrackingResult> = {
     lastUpdated: '2 hours ago',
     origin: 'Paris, France',
     destination: 'Surrey, England',
-    progress: 41,
+    progress: 89,
     events: [
+      { date: 'Feb 10', time: '09:31', location: 'Calais border', status: 'On Hold; Customs Clearance', isCompleted: false },
+      { date: 'Feb 9', time: '14:53', location: 'A350-900ULR, Cargo', status: 'In Transit', isCompleted: true },
       { date: 'Feb 6', time: '10:13', location: 'A350-900ULR, Cargo', status: 'In Transit', isCompleted: true, isCurrent: true },
       { date: 'Feb 2', time: '14:30', location: 'A350-900ULR, Cargo', status: 'In Transit', isCompleted: true, isCurrent: true },
       { date: 'Jan 31', time: '11:45', location: 'A350-900ULR, Cargo', status: 'Departed Facility', isCompleted: true },
