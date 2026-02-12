@@ -87,10 +87,10 @@ const mockTrackingData: Record<string, TrackingResult> = {
     destination: ' California, USA',
     progress: 91,
     events: [
-      { date: 'Feb 12', time: '13:11', location: "A350-900ULR, Cargo", status: 'On Hold; Customs Clearance', isCompleted: false, isCurrent: true },
+      { date: 'Feb 12', time: '13:06', location: "Los Angeles International Airport (LAX)", status: 'On Hold; Customs Clearance', isCompleted: false, isCurrent: true },
       { date: 'Feb 11', time: '22:31', location: 'A350-900ULR, Cargo', status: 'In Transit', isCompleted: true },
       { date: 'Feb 10', time: '14:53', location: 'A350-900ULR, Cargo', status: 'In Transit', isCompleted: true },
-      { date: 'Feb 9', time: '04:18', location: 'A350-900ULR, Cargo', status: 'In Transit', isCompleted: true },
+      { date: 'Feb 9', time: '14:18', location: 'A350-900ULR, Cargo', status: 'In Transit', isCompleted: true },
       { date: 'Feb 9', time: '07:30', location: 'A350-900ULR, Cargo', status: 'In Transit', isCompleted: true },
       { date: 'Feb 7', time: '07:22', location: 'Robinson Road, Singapore', status: 'Picked Up', isCompleted: true },
     ],
