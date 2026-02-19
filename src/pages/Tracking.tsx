@@ -99,7 +99,7 @@ const mockTrackingData: Record<string, TrackingResult> = {
     trackingNumber: 'HNL21385532',
     status: 'in-transit',
     estimatedDelivery: 'Feb 20, 2026',
-    lastUpdated: '1 hours ago',
+    lastUpdated: '7 hours ago',
     origin: 'RR, United States',
     destination: 'Khemisset, Morocco',
     progress: 25,
