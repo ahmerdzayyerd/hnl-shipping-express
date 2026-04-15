@@ -163,6 +163,23 @@ const mockTrackingData: Record<string, TrackingResult> = {
       { date: 'Apr 9', time: '07:22', location: '10 Hudson Yards, New York, NY 10001, United States', status: 'Picked Up', isCompleted: true },
     ],
   },
+
+    'HNL21385536': {
+    trackingNumber: 'HNL21385536',
+    status: 'in-transit',
+    estimatedDelivery: 'April 20, 2026',
+    lastUpdated: '2 hours ago',
+    origin: 'Paris, France',
+    destination: 'Key Biscayne, Florida',
+    progress: 11,
+    events: [
+      // { date: 'Jan 20', time: '10:45', location: 'Chicago, IL', status: 'Delivered', isCompleted: true, isCurrent: true },
+      // { date: 'Jan 20', time: '07:30', location: 'Chicago, IL', status: 'Out for Delivery', isCompleted: true },
+      // { date: 'Jan 19', time: '23:00', location: 'Chicago, IL', status: 'Arrived at Facility', isCompleted: true },
+      { date: 'Apr 14', time: '07:22', location: 'Rue Royale, Paris', status: 'Picked Up', isCompleted: true },
+      { date: 'Apr 14', time: '15:15', location: 'Rue Royale, Paris', status: 'Picked Up', isCompleted: true },
+    ],
+  },
 };
 
 const Tracking = () => {
