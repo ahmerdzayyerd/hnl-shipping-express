@@ -166,17 +166,17 @@ const mockTrackingData: Record<string, TrackingResult> = {
     'HNL21385536': {
     trackingNumber: 'HNL21385536',
     status: 'in-transit',
-    estimatedDelivery: 'May 7, 2026',
-    lastUpdated: '23 minutes ago',
+    estimatedDelivery: 'May 20, 2026',
+    lastUpdated: '21 minutes ago',
     origin: 'Paris, France',
     destination: 'Key Biscayne, Florida',
     progress: 20,
     events: [
       // { date: 'May 06', time: '10:45', location: 'Chicago, IL', status: 'Delivered', isCompleted: true, isCurrent: true },
       // { date: 'May 06', time: '07:30', location: 'A350-900ULR, Cargo', status: 'In Transit', isCompleted: true },
-      // { date: 'May 06', time: '23:00', location: 'A350-900ULR, Cargo', status: 'In Transit', isCompleted: true },
-      { date: 'May 05', time: '12:17', location: 'A350-900ULR, Cargo', status: 'In Transit', isCompleted: true },
-      { date: 'May 05', time: '11:14', location: 'Rue Royale, Paris', status: 'Picked Up', isCompleted: true },
+      // { date: 'May 19', time: '23:00', location: 'A350-900ULR, Cargo', status: 'In Transit', isCompleted: true },
+      { date: 'May 18', time: '12:17', location: 'A350-900ULR, Cargo', status: 'In Transit', isCompleted: true },
+      { date: 'May 18', time: '07:14', location: 'Rue Royale, Paris', status: 'Picked Up', isCompleted: true },
     ],
   },
 };
