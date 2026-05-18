@@ -176,7 +176,7 @@ const mockTrackingData: Record<string, TrackingResult> = {
       // { date: 'May 06', time: '07:30', location: 'A350-900ULR, Cargo', status: 'In Transit', isCompleted: true },
       // { date: 'May 19', time: '23:00', location: 'A350-900ULR, Cargo', status: 'In Transit', isCompleted: true },
       { date: 'May 18', time: '12:17', location: 'A350-900ULR, Cargo', status: 'In Transit', isCompleted: true },
-      { date: 'May 18', time: '07:14', location: 'Rue Royale, Paris', status: 'Picked Up', isCompleted: true },
+      { date: 'May 18', time: '07:14', location: 'Stockholm, Sweden', status: 'Picked Up', isCompleted: true },
     ],
   },
 };
