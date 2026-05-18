@@ -168,7 +168,7 @@ const mockTrackingData: Record<string, TrackingResult> = {
     status: 'in-transit',
     estimatedDelivery: 'May 20, 2026',
     lastUpdated: '21 minutes ago',
-    origin: 'Paris, France',
+    origin: 'Stockholm, Sweden',
     destination: 'Key Biscayne, Florida',
     progress: 20,
     events: [
