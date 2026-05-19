@@ -170,7 +170,7 @@ const mockTrackingData: Record<string, TrackingResult> = {
     lastUpdated: '21 minutes ago',
     origin: 'Stockholm, Sweden',
     destination: 'Key Biscayne, Florida',
-    progress: 20,
+    progress: 63,
     events: [
       // { date: 'May 06', time: '10:45', location: 'Chicago, IL', status: 'Delivered', isCompleted: true, isCurrent: true },
       // { date: 'May 06', time: '07:30', location: 'A350-900ULR, Cargo', status: 'In Transit', isCompleted: true },
