@@ -167,7 +167,7 @@ const mockTrackingData: Record<string, TrackingResult> = {
     trackingNumber: 'HNL21385536',
     status: 'in-transit',
     estimatedDelivery: 'May 20, 2026',
-    lastUpdated: '8 minutes ago',
+    lastUpdated: '2 minutes ago',
     origin: 'Stockholm, Sweden',
     destination: 'Key Biscayne, Florida',
     progress: 85,
