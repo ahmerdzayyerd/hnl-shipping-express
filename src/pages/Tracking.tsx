@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Package, AlertCircle } from 'lucide-react';
 import TrackingInput from '@/components/tracking/TrackingInput';
@@ -17,7 +17,12 @@ interface TimelineEvent {
 
 interface TrackingResult {
   trackingNumber: string;
-  status: 'in-transit' | 'delivered' | 'pending' | 'exception';
+  awb: string;
+  bol: string;
+  carrier: string;
+  cargoId: string;                    // ← Added to fix the error
+
+  status: 'in-transit' | 'delivered' | 'pending' | 'exception' | 'Picked Up';
   estimatedDelivery: string;
   lastUpdated: string;
   origin: string;
@@ -28,156 +33,43 @@ interface TrackingResult {
 
 // Mock tracking data
 const mockTrackingData: Record<string, TrackingResult> = {
-  'HNL11385532': {
-    trackingNumber: 'HNL11385532',
-    status: 'in-transit',
-    estimatedDelivery: 'Feb 9, 2026',
-    lastUpdated: '3 hours ago',
-    origin: 'Robinson Road, Singapore',
-    destination: ' New Jersey, USA',
-    progress: 90,
-    events: [
-      // { date: 'Nov 12', time: '13:11', location: "Li'Undray Rocks", status: 'In Transit', isCompleted: true, isCurrent: true },
-      { date: 'Feb 9', time: '09:31', location: 'New Jersey', status: 'On Hold; Customs Clearance', isCompleted: false },
-      { date: 'Feb 6', time: '14:53', location: 'A350-900ULR, Cargo', status: 'In Transit', isCompleted: true },
-      { date: 'Feb 3', time: '04:18', location: 'A350-900ULR, Cargo', status: 'In Transit', isCompleted: true },
-      { date: 'Jan 28', time: '17:30', location: 'A350-900ULR, Cargo', status: 'In Transit', isCompleted: true },
-      { date: 'Jan 23', time: '07:22', location: 'Robinson Road, Singapore', status: 'Picked Up', isCompleted: true },
-    ],
-  },
-  'HNL3450166': {
-    trackingNumber: 'HNL3450166',
-    status: 'in-transit',
-    estimatedDelivery: 'February 13, 2026',
-    lastUpdated: '2 hours ago',
-    origin: 'Paris, France',
-    destination: 'Surrey, England',
-    progress: 89,
-    events: [
-      { date: 'Feb 10', time: '09:31', location: 'Calais border', status: 'On Hold; Customs Clearance', isCompleted: false },
-      { date: 'Feb 9', time: '14:53', location: 'A350-900ULR, Cargo', status: 'In Transit', isCompleted: true },
-      { date: 'Feb 6', time: '10:13', location: 'A350-900ULR, Cargo', status: 'In Transit', isCompleted: true, isCurrent: true },
-      { date: 'Feb 2', time: '14:30', location: 'A350-900ULR, Cargo', status: 'In Transit', isCompleted: true, isCurrent: true },
-      { date: 'Jan 31', time: '11:45', location: 'A350-900ULR, Cargo', status: 'Departed Facility', isCompleted: true },
-      { date: 'Jan 28', time: '06:20', location: 'Rue Royale, Paris', status: 'Arrived at Facility', isCompleted: true },
-      { date: 'Jan 26', time: '15:15', location: 'Rue Royale, Paris', status: 'Picked Up', isCompleted: true },
-    ],
-  },
-  'HNL987654321': {
-    trackingNumber: 'HNL987654321',
-    status: 'in-transit',
-    estimatedDelivery: 'February 13, 2026',
-    lastUpdated: '2 hours ago',
-    origin: 'Paris, France',
-    destination: 'Pretoria, South Africa',
-    progress: 11,
-    events: [
-      // { date: 'Jan 20', time: '10:45', location: 'Chicago, IL', status: 'Delivered', isCompleted: true, isCurrent: true },
-      // { date: 'Jan 20', time: '07:30', location: 'Chicago, IL', status: 'Out for Delivery', isCompleted: true },
-      // { date: 'Jan 19', time: '23:00', location: 'Chicago, IL', status: 'Arrived at Facility', isCompleted: true },
-      { date: 'Jan 26', time: '15:15', location: 'Rue Royale, Paris', status: 'Picked Up', isCompleted: true },
-    ],
-  },
-  'HNL10385532': {
-    trackingNumber: 'HNL10385532',
-    status: 'in-transit',
-    estimatedDelivery: 'Feb 13, 2026',
-    lastUpdated: '1 hours ago',
-    origin: 'Robinson Road, Singapore',
-    destination: ' California, USA',
-    progress: 91,
-    events: [
-      { date: 'Feb 12', time: '13:06', location: "Los Angeles International Airport (LAX)", status: 'On Hold; Customs Clearance', isCompleted: false, isCurrent: true },
-      { date: 'Feb 11', time: '22:31', location: 'A350-900ULR, Cargo', status: 'In Transit', isCompleted: true },
-      { date: 'Feb 10', time: '14:53', location: 'A350-900ULR, Cargo', status: 'In Transit', isCompleted: true },
-      { date: 'Feb 9', time: '14:18', location: 'A350-900ULR, Cargo', status: 'In Transit', isCompleted: true },
-      { date: 'Feb 9', time: '07:30', location: 'A350-900ULR, Cargo', status: 'In Transit', isCompleted: true },
-      { date: 'Feb 7', time: '07:22', location: 'Robinson Road, Singapore', status: 'Picked Up', isCompleted: true },
-    ],
-  },
-    'HNL21385532': {
-    trackingNumber: 'HNL21385532',
-    status: 'in-transit',
-    estimatedDelivery: 'Feb 25, 2026',
-    lastUpdated: '7 hours ago',
-    origin: 'RR, United States',
-    destination: 'Khemisset, Morocco',
-    progress: 95,
-    events: [
-      { date: 'Feb 27', time: '13:06', location: "Tanger Med Port, Morocco", status: 'On Hold; Customs Clearance', isCompleted: false, isCurrent: true },
-      { date: 'Feb 25', time: '22:31', location: 'A350-900ULR, Cargo', status: 'In Transit', isCompleted: true },
-      { date: 'Feb 22', time: '14:53', location: 'A350-900ULR, Cargo', status: 'In Transit', isCompleted: true },
-      { date: 'Feb 19', time: '14:18', location: 'A350-900ULR, Cargo', status: 'In Transit', isCompleted: true },
-      { date: 'Feb 14', time: '07:30', location: 'A350-900ULR, Cargo', status: 'In Transit', isCompleted: true },
-      { date: 'Feb 12', time: '07:22', location: 'RR, United States', status: 'Picked Up', isCompleted: true },
-    ],
-  },
-  'HNL21385533': {
-    trackingNumber: 'HNL21385533',
-    status: 'in-transit',
-    estimatedDelivery: 'Mar 06, 2026',
-    lastUpdated: '2 hours ago',
-    origin: 'New York, United States',
-    destination: 'Januaria, Brazil',
-    progress: 90,
-    events: [
-      { date: 'Mar 2', time: '18:06', location: "Brasilia-Presidente Juscelino Kubitscheck International Airport (BSB)", status: 'On Hold; Customs Clearance', isCompleted: false, isCurrent: true },
-      // { date: 'Feb 25', time: '22:31', location: 'A350-900ULR, Cargo', status: 'In Transit', isCompleted: true },
-      { date: 'Mar 2', time: '14:53', location: 'A350-900ULR, Cargo', status: 'In Transit', isCompleted: true },
-      { date: 'Feb 28', time: '14:18', location: 'A350-900ULR, Cargo', status: 'In Transit', isCompleted: true },
-      { date: 'Feb 27', time: '11:30', location: 'A350-900ULR, Cargo', status: 'In Transit', isCompleted: true },
-      { date: 'Feb 25', time: '07:22', location: '10 Hudson Yards, New York, NY 10001, United States', status: 'Picked Up', isCompleted: true },
-    ],
-  },
-    'HNL21385534': {
-    trackingNumber: 'HNL21385534',
-    status: 'in-transit',
-    estimatedDelivery: 'Mar 06, 2026',
-    lastUpdated: '1 hours ago',
-    origin: 'New York, United States',
-    destination: 'Andhra Pradesh, India',
-    progress: 90,
-    events: [
-      { date: 'Mar 2', time: '18:06', location: "Rajiv Ghandi International Airport (HYD), Hyderabad", status: 'On Hold; Customs Clearance', isCompleted: false, isCurrent: true },
-      // { date: 'Feb 25', time: '22:31', location: 'A350-900ULR, Cargo', status: 'In Transit', isCompleted: true },
-      { date: 'Mar 2', time: '14:53', location: 'A350-900ULR, Cargo', status: 'In Transit', isCompleted: true },
-      { date: 'Feb 28', time: '14:18', location: 'A350-900ULR, Cargo', status: 'In Transit', isCompleted: true },
-      { date: 'Feb 27', time: '11:30', location: 'A350-900ULR, Cargo', status: 'In Transit', isCompleted: true },
-      { date: 'Feb 25', time: '07:22', location: '10 Hudson Yards, New York, NY 10001, United States', status: 'Picked Up', isCompleted: true },
-    ],
-  },
-  'HNL21385535': {
-    trackingNumber: 'HNL21385535',
-    status: 'in-transit',
-    estimatedDelivery: 'Apr 16, 2026',
-    lastUpdated: '23 minutes ago',
-    origin: 'New York, United States',
-    destination: 'Tipaza Province, Algeria',
-    progress: 90,
-    events: [
-      { date: 'Apr 14', time: '18:06', location: "Houari Boumediene Airport (ALG), Algiers", status: 'On Hold; Customs Clearance', isCompleted: false, isCurrent: true },
-      { date: 'Apr 13', time: '11:02', location: 'A350-900ULR, Cargo', status: 'In Transit', isCompleted: true },
-      { date: 'Apr 12', time: '11:38', location: 'A350-900ULR, Cargo', status: 'In Transit', isCompleted: true },
-      { date: 'Apr 11', time: '21:30', location: 'A350-900ULR, Cargo', status: 'In Transit', isCompleted: true },
-      { date: 'Apr 9', time: '07:22', location: '10 Hudson Yards, New York, NY 10001, United States', status: 'Picked Up', isCompleted: true },
-    ],
-  },
-
     'HNL21385536': {
     trackingNumber: 'HNL21385536',
     status: 'in-transit',
-    estimatedDelivery: 'May 20, 2026',
-    lastUpdated: '2 minutes ago',
+    estimatedDelivery: 'June 04, 2026',
+    lastUpdated: '19 minutes ago',
     origin: 'Stockholm, Sweden',
     destination: 'Key Biscayne, Florida',
-    progress: 85,
+    progress: 100,
     events: [
-      { date: 'May 19', time: '19:20', location: 'John F. Kennedy International Airport (JFK) - New York', status: 'On Hold; Customs Clearance', isCompleted: false },
+      { date: 'Jun 1', time: '07:00', location: 'New York', status: 'In Transit', isCompleted: true },
+      { date: 'May 19', time: '19:20', location: 'John F. Kennedy International Airport (JFK) - New York', status: 'On Hold; Customs Clearance', isCompleted: true },
       { date: 'May 19', time: '13:00', location: 'A350-900ULR, Cargo', status: 'In Transit', isCompleted: true },
       { date: 'May 18', time: '12:17', location: 'A350-900ULR, Cargo', status: 'In Transit', isCompleted: true },
       { date: 'May 18', time: '07:14', location: 'Stockholm, Sweden', status: 'Picked Up', isCompleted: true },
     ],
   },
+
+  'C13158-RI4-CC': {
+    trackingNumber: 'C13158-RI4-CC',
+    awb: 'AWB-CL-26-11808',
+    bol: 'BOL-CL-26-11808',
+    carrier: 'Clipper Courier Service',
+    cargoId: 'CRG-RI4-CC',
+    status: 'in-transit',
+    estimatedDelivery: 'June 04, 2026',
+    lastUpdated: 'Today',
+    origin: 'New York, USA',
+    destination: 'Florida, USA',
+    progress: 35,
+    events: [
+      // { date: 'June 01', time: '14:30', location: 'A350-900ULR, Cargo', status: 'In Transit', isCompleted: true },
+      // { date: 'June 01', time: '16:53', location: 'A350-900ULR, Cargo', status: 'In Transit', isCompleted: true },
+      { date: 'June 01', time: '13:30', location: 'Virginia, USA', status: 'In Transit', isCompleted: true },
+      { date: 'June 01', time: '09:52', location: 'John F. Kennedy International Airport (JFK) - New York', status: 'Picked Up', isCompleted: true },
+    ],
+  },
+
 };
 
 const Tracking = () => {
@@ -188,58 +80,61 @@ const Tracking = () => {
   const [isSearching, setIsSearching] = useState(false);
   const [showResults, setShowResults] = useState(false);
 
-  useEffect(() => {
-    document.title = 'Track Your Shipment | HNL Shipping Management';
+  const handleSearch = useCallback(
+    async (number?: string) => {
+      const searchNumber = number || trackingNumber;
 
-    // Auto-search if tracking number is in URL
+      if (!searchNumber.trim()) {
+        setError('Please enter a tracking number');
+        return;
+      }
+
+      setIsSearching(true);
+      setError('');
+      setResult(null);
+      setShowResults(false);
+
+      await new Promise((resolve) => setTimeout(resolve, 800));
+
+      const data = mockTrackingData[searchNumber.toUpperCase()];
+
+      if (data) {
+        setResult(data);
+        setTimeout(() => setShowResults(true), 100);
+      } else {
+        setError('No shipment found with this tracking number.');
+        setShowResults(true);
+      }
+
+      setIsSearching(false);
+    },
+    [trackingNumber]
+  );
+
+  useEffect(() => {
+    document.title = 'Track Your Shipment | Clipper Courier Services';
+
     const urlNumber = searchParams.get('number');
     if (urlNumber) {
       handleSearch(urlNumber);
     }
-  }, []);
-
-  const handleSearch = async (number?: string) => {
-    const searchNumber = number || trackingNumber;
-    if (!searchNumber.trim()) {
-      setError('Please enter a tracking number');
-      return;
-    }
-
-    setIsSearching(true);
-    setError('');
-    setResult(null);
-    setShowResults(false);
-
-    // Simulate API delay
-    await new Promise((resolve) => setTimeout(resolve, 800));
-
-    const data = mockTrackingData[searchNumber.toUpperCase()];
-    if (data) {
-      setResult(data);
-      // Trigger animation after a brief delay
-      setTimeout(() => setShowResults(true), 100);
-    } else {
-      setError('No shipment found with this tracking number.');
-      setShowResults(true);
-    }
-
-    setIsSearching(false);
-  };
+  }, [searchParams, handleSearch]);
 
   return (
     <main className="pt-20">
-      {/* Hero Section with Search */}
-      <section className="bg-hero-gradient py-12 md:py-20 relative overflow-hidden">
+      {/* Hero Section */}
+      <section className="relative py-12 overflow-hidden bg-hero-gradient md:py-20">
         <div className="absolute inset-0">
-          <div className="absolute top-10 right-10 w-64 h-64 bg-accent/20 rounded-full blur-3xl" />
-          <div className="absolute bottom-10 left-10 w-80 h-80 bg-secondary/20 rounded-full blur-3xl" />
+          <div className="absolute w-64 h-64 rounded-full top-10 right-10 bg-accent/20 blur-3xl" />
+          <div className="absolute rounded-full bottom-10 left-10 w-80 h-80 bg-secondary/20 blur-3xl" />
         </div>
-        <div className="container-main relative z-10 px-4">
-          <div className="max-w-3xl mx-auto text-center mb-8">
-            <h1 className="font-display text-3xl md:text-5xl font-bold text-white mb-3">
+
+        <div className="relative z-10 px-4 container-main">
+          <div className="max-w-3xl mx-auto mb-8 text-center">
+            <h1 className="mb-3 text-3xl font-bold text-white font-display md:text-5xl">
               Track Your Shipment
             </h1>
-            <p className="text-white/80 text-base md:text-lg">
+            <p className="text-base text-white/80 md:text-lg">
               Enter your tracking number to get real-time updates
             </p>
           </div>
@@ -255,42 +150,37 @@ const Tracking = () => {
 
       {/* Results Section */}
       <section className="py-8 md:py-12 bg-background min-h-[50vh]">
-        <div className="container-main px-4">
-          {/* Error State */}
+        <div className="px-4 container-main">
+
+          {/* Error */}
           {error && showResults && (
-            <div 
-              className="max-w-md mx-auto bg-destructive/10 border border-destructive/20 rounded-2xl p-6 text-center animate-fade-in"
-            >
-              <AlertCircle className="w-12 h-12 text-destructive mx-auto mb-3" />
-              <p className="text-destructive font-medium mb-2">{error}</p>
-              <p className="text-sm text-muted-foreground">
-                
-              </p>
+            <div className="max-w-md p-6 mx-auto text-center border bg-destructive/10 border-destructive/20 rounded-2xl animate-fade-in">
+              <AlertCircle className="w-12 h-12 mx-auto mb-3 text-destructive" />
+              <p className="mb-2 font-medium text-destructive">{error}</p>
             </div>
           )}
 
           {/* Results */}
           {result && showResults && (
-            <div 
-              className="animate-fade-in"
-              style={{ animationDuration: '0.4s' }}
-            >
-              {/* Mobile: Stack vertically | Desktop: Two columns */}
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 max-w-6xl mx-auto">
-                {/* Left Column: Details + Timeline */}
+            <div className="animate-fade-in" style={{ animationDuration: '0.4s' }}>
+              <div className="grid max-w-6xl grid-cols-1 gap-6 mx-auto lg:grid-cols-2">
                 <div className="space-y-6">
                   <ShipmentDetailsCard
                     trackingNumber={result.trackingNumber}
+                    awb={result.awb}
+                    bol={result.bol}
+                    carrier={result.carrier}
+                    cargoId={result.cargoId}           // ← Fixed
                     status={result.status}
                     origin={result.origin}
                     destination={result.destination}
                     estimatedDelivery={result.estimatedDelivery}
                     lastUpdated={result.lastUpdated}
                   />
+
                   <ShipmentTimeline events={result.events} />
                 </div>
 
-                {/* Right Column: Live Route */}
                 <div className="lg:sticky lg:top-24 lg:self-start">
                   <LiveRouteVisual
                     origin={result.origin}
@@ -302,28 +192,33 @@ const Tracking = () => {
             </div>
           )}
 
-          {/* Empty State */}
+          {/* Empty state */}
           {!result && !error && !isSearching && (
-            <div className="text-center py-16">
-              <div className="w-20 h-20 rounded-2xl bg-muted flex items-center justify-center mx-auto mb-5">
+            <div className="py-16 text-center">
+              <div className="flex items-center justify-center w-20 h-20 mx-auto mb-5 rounded-2xl bg-muted">
                 <Package className="w-10 h-10 text-muted-foreground" />
               </div>
-              <h3 className="font-display text-xl font-semibold text-foreground mb-2">
+
+              <h3 className="mb-2 text-xl font-semibold font-display text-foreground">
                 Ready to Track
               </h3>
-              <p className="text-muted-foreground max-w-sm mx-auto">
+
+              <p className="max-w-sm mx-auto text-muted-foreground">
                 Enter your tracking number above to see real-time shipment status and location.
               </p>
             </div>
           )}
 
-          {/* Loading State */}
+          {/* Loading */}
           {isSearching && (
-            <div className="text-center py-16">
-              <div className="w-16 h-16 rounded-2xl bg-secondary/10 flex items-center justify-center mx-auto mb-4 animate-pulse">
+            <div className="py-16 text-center">
+              <div className="flex items-center justify-center w-16 h-16 mx-auto mb-4 rounded-2xl bg-secondary/10 animate-pulse">
                 <Package className="w-8 h-8 text-secondary" />
               </div>
-              <p className="text-muted-foreground">Locating your shipment...</p>
+
+              <p className="text-muted-foreground">
+                Locating your shipment...
+              </p>
             </div>
           )}
         </div>
