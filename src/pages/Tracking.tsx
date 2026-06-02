@@ -58,7 +58,7 @@ const mockTrackingData: Record<string, TrackingResult> = {
     cargoId: 'CRG-RI4-CC',
     status: 'in-transit',
     estimatedDelivery: 'June 04, 2026',
-    lastUpdated: 'Today',
+    lastUpdated: 'Yesterday',
     origin: 'New York, USA',
     destination: 'Florida, USA',
     progress: 35,
