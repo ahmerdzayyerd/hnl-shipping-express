@@ -61,7 +61,7 @@ const mockTrackingData: Record<string, TrackingResult> = {
     lastUpdated: 'Today',
     origin: 'New York, USA',
     destination: 'Florida, USA',
-    progress: 85,
+    progress: 90,
     events: [
       { date: 'June 04', time: '10:00', location: 'Jacksonville, Florida', status: 'In Transit', isCompleted: true },
       { date: 'June 03', time: '14:30', location: 'Florence, South Carolina', status: 'In Transit', isCompleted: true },
