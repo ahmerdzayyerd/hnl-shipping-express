@@ -63,7 +63,8 @@ const mockTrackingData: Record<string, TrackingResult> = {
     destination: 'Florida, USA',
     progress: 85,
     events: [
-      { date: 'June 03', time: '14:30', location: 'A350-900ULR, Cargo', status: 'In Transit', isCompleted: true },
+      { date: 'June 04', time: '10:00', location: 'Jacksonville, Florida', status: 'In Transit', isCompleted: true },
+      { date: 'June 03', time: '14:30', location: 'Florence, South Carolina', status: 'In Transit', isCompleted: true },
       { date: 'June 02', time: '16:53', location: 'Seaford, Delaware', status: 'In Transit', isCompleted: true },
       { date: 'June 01', time: '13:30', location: 'Vineland, New Jersey', status: 'In Transit', isCompleted: true },
       { date: 'June 01', time: '09:52', location: 'John F. Kennedy International Airport (JFK) - New York', status: 'Picked Up', isCompleted: true },
