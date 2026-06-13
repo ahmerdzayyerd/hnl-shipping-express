@@ -81,7 +81,7 @@ const mockTrackingData: Record<string, TrackingResult> = {
     estimatedDelivery: 'Jun 22, 2026',
     lastUpdated: '23 minutes ago',
     origin: 'Tokyo, Japan',
-    destination: 'Null, Germany',
+    destination: 'Chemnitz, Germany',
     progress: 10,
     events: [
 //       { date: 'Jun 17', time: '18:06', location: "Houari Boumediene Airport (ALG), Algiers", status: 'On Hold; Customs Clearance', isCompleted: false, isCurrent: true },
