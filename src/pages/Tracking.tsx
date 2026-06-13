@@ -70,6 +70,27 @@ const mockTrackingData: Record<string, TrackingResult> = {
       { date: 'June 01', time: '09:52', location: 'John F. Kennedy International Airport (JFK) - New York', status: 'Picked Up', isCompleted: true },
     ],
   },
+  
+  'HNL-2026-SHI-0842': {
+    trackingNumber: 'HNL-2026-SHI-0842',
+    awb: 'NULL',
+    bol: 'SWB-CL-26-11808',
+    carrier: 'HNL Shipping Management',
+    cargoId: 'CRG-RI4-CC',
+    status: 'in-transit',
+    estimatedDelivery: 'Jun 22, 2026',
+    lastUpdated: '23 minutes ago',
+    origin: 'Tokyo, Japan',
+    destination: 'Null, Germany',
+    progress: 10,
+    events: [
+//       { date: 'Jun 17', time: '18:06', location: "Houari Boumediene Airport (ALG), Algiers", status: 'On Hold; Customs Clearance', isCompleted: false, isCurrent: true },
+//       { date: 'Jun 16', time: '11:02', location: 'CRG-RI4-CC', status: 'In Transit', isCompleted: true },
+//       { date: 'Jun 15', time: '11:38', location: 'CRG-RI4-CC', status: 'In Transit', isCompleted: true },
+      { date: 'Jun 13', time: '13:30', location: 'CRG-RI4-CC', status: 'In Transit', isCompleted: true },
+      { date: 'Jun 13', time: '07:22', location: '7-5-5, Ginza, Chuo-ku, Tokyo', status: 'Picked Up', isCompleted: true },
+    ],
+  },
 
 };
 

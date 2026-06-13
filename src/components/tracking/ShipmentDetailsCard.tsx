@@ -143,7 +143,7 @@ const ShipmentDetailsCard = ({
             <div className="flex items-center gap-2 mb-2">
               <FileText className="w-4 h-4 text-secondary" />
               <p className="text-xs tracking-wide uppercase text-muted-foreground">
-                Bill Of Lading
+                Sea Waybill
               </p>
             </div>
 
