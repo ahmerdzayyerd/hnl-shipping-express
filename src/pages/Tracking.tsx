@@ -84,7 +84,11 @@ const mockTrackingData: Record<string, TrackingResult> = {
     destination: 'Chemnitz, Germany',
     progress: 35,
     events: [
-//       { date: 'Jun 17', time: '18:06', location: "Houari Boumediene Airport (ALG), Algiers", status: 'On Hold; Customs Clearance', isCompleted: false, isCurrent: true },
+      // { date: 'Jun 20', time: '18:06', location: "Houari Boumediene Airport (ALG), Algiers", status: 'On Hold; Customs Clearance', isCompleted: false, isCurrent: true },
+      // { date: 'Jun 19', time: '11:02', location: 'CRG-RI4-CC', status: 'In Transit', isCompleted: true },
+      // { date: 'Jun 18', time: '11:38', location: 'CRG-RI4-CC', status: 'In Transit', isCompleted: true },
+      // { date: 'Jun 17', time: '11:02', location: 'CRG-RI4-CC', status: 'In Transit', isCompleted: true },
+      // { date: 'Jun 16', time: '11:38', location: 'CRG-RI4-CC', status: 'In Transit', isCompleted: true },
       { date: 'Jun 15', time: '11:02', location: 'CRG-RI4-CC', status: 'In Transit', isCompleted: true },
       { date: 'Jun 14', time: '11:38', location: 'CRG-RI4-CC', status: 'In Transit', isCompleted: true },
       { date: 'Jun 13', time: '13:30', location: 'CRG-RI4-CC', status: 'In Transit', isCompleted: true },
